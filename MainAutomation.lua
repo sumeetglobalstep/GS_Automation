@@ -3,8 +3,8 @@
 -- Main Automation File for the DOT
 
 require "Media/GameData/Interactions/Util"
-require "Media/GameData/Interactions/GlobalStepUtil"
-require "Media/GameData/Interactions/Battle"
+require "Media/GameData/Interactions/GS_Automation/GlobalStepUtil"
+require "Media/GameData/Interactions/GS_Automation/Battle"
 
 -- Reset the Profile
 LoadProfilePreset("")
