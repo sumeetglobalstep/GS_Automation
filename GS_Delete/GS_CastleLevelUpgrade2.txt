@@ -1,0 +1,38 @@
+--- Castle Level 2 Upgrade starts
+
+
+function 
+
+OptionalClickByPath("*.zoomButton") -- Zoom button 
+Wait(3)
+OptionalClickByPath("*.doneButton")-- Enter button
+
+Wait(3)
+OptionalClickByPath("*.requiredA.button")
+
+Wait(3)
+OptionalClickByPath("*.buildingInspector.panel.upgradeButton")
+
+Wait(3)
+OptionalClickByPath("*.ui.confirmation.upgradeButton") -- Skip button
+
+Wait(3)
+OptionalClickByPath("*.ui.confirmation.doneButton")  -- Skip button
+
+-- Castle Level 2 Upgrade Completed 
+GS_TalkingHeadCheck("Castle Level 3",2)
+Wait(10)
+
+while not OptionalClickByPath("*.unitUpgrade.upgradeButton") do 
+	GS_FollowGuide("Castle Level 3")
+end
+
+
+GS_TalkingHeadCheck("Armory upgrade ENDS", 2)
+GS_GenerateClick(114, 521)
+Wait(3)
+
+OptionalClickByPath("*.unitUpgrade.upgradeButton")
+Wait(3)
+OptionalClickByPath("*.closeButton")-- Enter button
+-- Armory upgrade ENDS
