@@ -1,7 +1,8 @@
 -- Interacts with CPP functions
+require "Media/GameData/Interactions/GSAutomation/GlobalVars"
 
-exitGame = false
-function ExitGame()
+function IsHaltScriptRequested()
+
 	if IsExitRequested() then
 		return true
 	elseif exitGame then
@@ -9,8 +10,4 @@ function ExitGame()
 	else
 		return false
 	end
-end
-
-function GuideActive()
-	return IsGuideActive()
 end

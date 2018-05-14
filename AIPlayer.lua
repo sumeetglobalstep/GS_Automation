@@ -1,9 +1,10 @@
 require "Media/GameData/Interactions/Util"
 require "Media/GameData/Interactions/GSAutomation/StateActions"
 require "Media/GameData/Interactions/GSAutomation/InteractionAPI"
+require "Media/GameData/Interactions/GSAutomation/GlobalVars"
 
+function IsCriticalPopUp()
 
-function CriticalPopUp()
 	if FindElementByPath("*.ui.textEntry.doneButton") then
 		FindAndClickByPath("*.ui.textEntry.doneButton")
 		return true
@@ -16,12 +17,13 @@ function CriticalPopUp()
 	return false
 end
 
-function PopUpActive()
+function IsPopUpActive()
+
 	if FindElement("REGISTRATION_CONTINUE", "", "") then
 		FindAndClickByPath("*.Registration.*")
 		FindAndClick("REGISTRATION_CONTINUE", "", "")
 		return true
-	elseif FindElementByPath("*.outOfResourcesItem.tapArea") then
+	elseif FindElementByPath("*.outOfResourcesItem.tapArea") then --Collect Gold
 		FindAndClickByPath("*.outOfResourcesItem.tapArea")
 		return true
 	elseif FindElementByPath("*.doneButton") then   --Done/Ok Button
@@ -39,22 +41,16 @@ function PopUpActive()
 	elseif FindElementByPath("*.eventSummaryPopup.closeButton") then
 		FindAndClickByPath("*.eventSummaryPopup.closeButton")
 		return true
-	elseif FindElementByPath("*.SoftPromptRating.*") then
-		if FindElementByPath("*.SoftPromptRating.closeBtn.*") then
-			FindAndClickByPath("*.SoftPromptRating.closeBtn.*")
-		else
-			FindAndClick("CLOSE", "", "")
-		end
 	elseif FindElement("SERVER_RESYNC", "", "") then
 		FindAndClick("SERVER_RESYNC", "", "")
 		return true
 	elseif FindElement("SEND_TO_TITLE", "", "") then
 		FindAndClick("SEND_TO_TITLE", "", "")
 		return true
-	elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") then
+	elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") then -- Handles unwanted TalkingHeads
 		if FindElementByPath("*.ui.talkingHead.animationContainer.*") then
 			WaitForUI()
-			GenerateClick(0.5,0.5)
+			GenerateClick(0.5,0.5) -- Generates a click on center of screen
 			return true
 		end
 	end
@@ -62,9 +58,10 @@ function PopUpActive()
 	return false
 end
 
-function StateHandled()
-	print ("StateHandled called")
-	if	ControlGameState()  then
+function IsStateHandled()
+
+	if GameState[GetCurrentState()] then
+		GameState[GetCurrentState()]()
 		return true
 	end
 	
@@ -72,26 +69,24 @@ function StateHandled()
 end
 
 function AIControl()
-	if CriticalPopUp() then
+
+	if IsCriticalPopUp() then
 		print("Will Dismiss any CriticalPopUp")
-		return true
-	elseif GuideActive() then
+	elseif IsGuideActive() then
 		print("Will Follow Guide")
 		FollowGuide()
-		return true
-	elseif PopUpActive() then
+	elseif IsPopUpActive() then
 		print("Will Dismiss any PopUp")
-		return true
-	elseif StateHandled() then
-		return true
+	elseif IsStateHandled() then
+		print("StateHandledByScript:",GetCurrentState())
 	else
 		print("Script Waiting To Take Action")
 	end
-	
-	return false
+
 end
 
-while not ExitGame() do
+while not IsHaltScriptRequested() do
 	AIControl()
+	print("NameVar",nameVar)
 	Wait(2.0)
 end

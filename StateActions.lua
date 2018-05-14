@@ -1,11 +1,6 @@
-local path = require "Media/GameData/Interactions/GSAutomation/GlobalVars"
+require "Media/GameData/Interactions/GSAutomation/GlobalVars"
 
 GameState = {}
-armyUnitsX = {0.2 , 0.36 , 0.52 , 0.77}
-armyUnitsY = 0.6
-
-targetX = 0.5
-targetY = 0.3
 
 GameState["RESULTS"] = function()
 	print("Inside Results state")
@@ -28,9 +23,9 @@ end
 
 GameState["BATTLEGAME"] = function()
 	print("BATTLEGAME state called")
-	if FindElementByPath(path.cinematicSkipButton) then
+	if FindElementByPath(cinematicSkipButton) then
 		print("Skip Button Found")
-		FindAndClickByPath(path.cinematicSkipButton)
+		FindAndClickByPath(cinematicSkipButton)
 		return true
 	end
 	
@@ -75,6 +70,7 @@ end
 
 
 function ControlGameState()
+
 	print("ControlGameState called")
 	if GameState[GetCurrentState()] then
 		GameState[GetCurrentState()]()
