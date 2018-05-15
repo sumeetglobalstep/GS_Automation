@@ -2,7 +2,7 @@
 
 exitGame = false
 
-function IsHaltScriptRequested()
+function IsHaltScriptRequested() --Stops Testing Script on request of game or when some stop testing condition is reached
 
 	if IsExitRequested() then
 		return true
@@ -13,7 +13,7 @@ function IsHaltScriptRequested()
 	end
 end
 
-function IsCriticalPopUp()
+function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is higher than FTUE
 
 	if FindElementByPath("*.ui.textEntry.doneButton") then
 		FindAndClickByPath("*.ui.textEntry.doneButton")
@@ -27,13 +27,10 @@ function IsCriticalPopUp()
 	return false
 end
 
-function IsPopUpActive()
+function IsPopUpActive() -- Handles PopUps , when FTUE not available
 
-	if FindElement("REGISTRATION_CONTINUE", "", "") then
-		FindAndClickByPath("*.Registration.*")
-		FindAndClick("REGISTRATION_CONTINUE", "", "")
-		return true
-	elseif FindElementByPath("*.outOfResourcesItem.tapArea") then --Collect Gold
+
+	if FindElementByPath("*.outOfResourcesItem.tapArea") then --Collect Gold
 		FindAndClickByPath("*.outOfResourcesItem.tapArea")
 		return true
 	elseif FindElementByPath("*.doneButton") then   --Done/Ok Button
@@ -51,22 +48,7 @@ function IsPopUpActive()
 	elseif FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
 		FindAndClickByPath("*.upgradeButton")
 		return true
-	elseif FindElementByPath("*.breadcrumbs.*.PopupXXL.*") then
-		FindAndClick("BTN2_CLICKED", "", "")
-		return true
-	elseif FindElementByPath("*.Rewards.popupHolder.*.btn1") then
-		FindAndClickByPath("*.Rewards.popupHolder.*.btn1")
-		return true
-	elseif FindElementByPath("*.eventSummaryPopup.closeButton") then
-		FindAndClickByPath("*.eventSummaryPopup.closeButton")
-		return true
-	elseif FindElement("SERVER_RESYNC", "", "") then
-		FindAndClick("SERVER_RESYNC", "", "")
-		return true
-	elseif FindElement("SEND_TO_TITLE", "", "") then
-		FindAndClick("SEND_TO_TITLE", "", "")
-		return true
-	elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") then -- Handles unwanted TalkingHeads
+	elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") and (GetCurrentState() ~= "BATTLEGAME") then -- Handles unwanted TalkingHeads
 		if FindElementByPath("*.ui.talkingHead.animationContainer.*") then
 			WaitForUI()
 			GenerateClick(0.5,0.5)

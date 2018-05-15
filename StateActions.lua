@@ -1,5 +1,7 @@
+require "Media/GameData/Interactions/Util"
 
 GameState = {}
+forceJoinAlliance = false
 
 GameState["RESULTS"] = function()
 	print("Inside Results state")
@@ -69,11 +71,87 @@ GameState["DYNAMIC_DEPLOYMENT"] = function()
 end
 
 GameState["CASTLE_VIEW"] = function()
-	SelectBuilding("Castle3")
-	-- if FindElementByPath("*.requiredA.button") then
-		-- print("Castle Upgrade 1 ");
-		-- FindAndClickByPath("*.requiredA.button")
-	-- end
+	
+	SelectBuilding("Castle2") -- Opens Castle Upgrade Panel to upgrade it to level 3
+
+	if GetProfileNode("castleLevel") >=3 or forceJoinAlliance==true then
+		if GetProfileNode("attributes_VP") < 1000 then
+			if FindElementByPath("*.zoomButton") then
+					FindAndClickByPath("*.zoomButton")
+			end
+		end
+	end
+	
+end
+
+GameState["LOADOUT_ATTACK"] = function()
+	
+	if FindElementByPath("*.header.closeButton") then
+		FindAndClickByPath("*.header.closeButton")
+	end
+end
+
+genPlinthCounter = 0
+
+GameState["EPIC_KINGDOM"] = function()
+	forceJoinAlliance = false
+	
+	if GetProfileNode("attributes_DIAMONDS")<2000 then
+		SetDebugVar("Add diamonds|Currency|Cheats", 10000)
+	end
+	if FindElementByPath("*.raidButton") then
+		if FindElementByPath("*.header.closeButton") then
+			FindAndClickByPath("*.header.closeButton")
+		end
+	end	
+	
+	if GetProfileNode("attributes_VP")<1000 then
+		
+		WaitForUI()
+		Wait(3.0)
+		
+		GenerateDrag(0.5,0.2,0.5,0.9) -- GenerateDrag to Activate Compass Button
+		WaitForUI()
+		Wait(3.0)
+		if FindElementByPath("*.gotoMyKingdomButton") then
+			FindAndClickByPath("*.gotoMyKingdomButton")
+		end
+		
+		WaitForUI()
+		Wait(3.0)
+		
+		GenerateDrag(0.51,0.2,0.48,0.80) -- Drag towards Neutral lands
+		Wait(3.0)
+		GenerateClick(0.58,0.65) -- Click's on a plinth to gain VP
+		
+		WaitForUI()
+		Wait(2.0)
+		
+		if FindElementByPath("*.rewardsGrid.*") then
+			if FindElementByPath("*.captureButton") then
+				FindAndClickByPath("*.captureButton")
+			end
+		elseif FindElementByPath("*.pveRecycleButton") then
+			FindAndClickByPath("*.pveRecycleButton")
+			genPlinthCounter = genPlinthCounter + 1
+			WaitForUI()
+			Wait(2.0)
+			if FindElementByPath("*.doneButton") then   --Done/Ok Button
+				FindAndClickByPath("*.doneButton")
+			end
+		end
+		
+		if genPlinthCounter>3 then
+			forceJoinAlliance = true
+		end
+		
+	end
+	
+	if forceJoinAlliance == true then
+		if FindElementByPath("*.zoomButton") then
+			FindAndClickByPath("*.zoomButton")
+		end
+	end	
 end
 
 function IsStateHandled()
