@@ -24,6 +24,5 @@ end
 
 while not IsHaltScriptRequested() do
 	AIControl()
-	print("NameVar",nameVar)
 	Wait(2.0)
 end

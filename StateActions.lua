@@ -68,7 +68,13 @@ GameState["DYNAMIC_DEPLOYMENT"] = function()
 	end
 end
 
-
+GameState["CASTLE_VIEW"] = function()
+	SelectBuilding("Castle3")
+	-- if FindElementByPath("*.requiredA.button") then
+		-- print("Castle Upgrade 1 ");
+		-- FindAndClickByPath("*.requiredA.button")
+	-- end
+end
 
 function IsStateHandled()
 

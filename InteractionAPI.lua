@@ -20,7 +20,7 @@ function IsCriticalPopUp()
 		return true
 	end
 	if FindElementByPath("*.ui.critical.doneButton") then
-		FindAndClickByPath(".ui.critical.doneButton")
+		FindAndClickByPath("*.ui.critical.doneButton")
 		return true
 	end
 	
@@ -38,6 +38,15 @@ function IsPopUpActive()
 		return true
 	elseif FindElementByPath("*.doneButton") then   --Done/Ok Button
 		FindAndClickByPath("*.doneButton")
+		if FindElementByPath("*header.closeButton") then
+			FindAndClickByPath("*header.closeButton")
+		end
+		return true
+	elseif FindElementByPath("*.requiredA.button") then --Collect Tick castle Upgrade
+		FindAndClickByPath("*.requiredA.button")
+		if FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
+			FindAndClickByPath("*.upgradeButton")
+		end
 		return true
 	elseif FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
 		FindAndClickByPath("*.upgradeButton")
