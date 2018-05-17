@@ -1,4 +1,3 @@
-require "Media/GameData/Interactions/Util"
 require "Media/GameData/Interactions/GSAutomation/InteractionAPI"
 
 GameState = {}
@@ -9,23 +8,18 @@ targetCastleLevel = 3
 minDiamondAmount = 1000
 rechargeDiamondAmount = 10000
 
+hasArmory = false
 
 GameState["RESULTS"] = function()
-	FindButtonAndClick("*.ui.rewardsScreen.continueButton",true)
-	FindButtonAndClick("*.ui.xpScreen.continueButton",true)	
-end
-
-GameState["SHOP"] = function()
-	 FindButtonAndClick("*.ui.reward.continueButton",true)
-	 FindButtonAndClick("*.header.closeButton",true)
+	FindButtonAndClick("*.continueButton", true)
 end
 
 GameState["REWARDS"] = function()
-	FindButtonAndClick("*.ui.okButton",true)
+	FindButtonAndClick("*.ui.okButton", true)
 end
 
-GameState["BATTLEGAME"] = function()
-	FindButtonAndClick("*.ui.skip.skipButton",true)
+GameState["BATTLEGAME"] = function() 
+	FindButtonAndClick("*.ui.skip.skipButton", true) --For Cinematic Skip
 end
 
 GameState["DYNAMIC_DEPLOYMENT"] = function()
@@ -33,68 +27,71 @@ GameState["DYNAMIC_DEPLOYMENT"] = function()
 	local targetX = 0.5
 	local targetY = 0.3
 
-	if FindButtonAndClick("*.autoOrders.Button",true) then
+	if FindButtonAndClick("*.autoOrders.Button", true) then
 		actionFound = true
 	end	
-	if FindButtonAndClick("*.ui.multiSelectButton.button",true) then
-		WaitForUI()
-		GenerateClick(targetX,targetY)
+	if FindButtonAndClick("*.ui.multiSelectButton.button", true) then
+		GenerateClick(targetX, targetY)
 		actionFound = true
 	end
 	if actionFound == false then -- event AI_CONTROL doesn't work, Passing HardCode values for initial Battle1 and Battle2
-		local armyUnitsX = {0.2 , 0.36 , 0.52 , 0.77}
+		local armyUnitsX = {0.2, 0.36, 0.52, 0.77}
 		local armyUnitsY = 0.6
 		
-		for i,armyCoordinateX in ipairs(armyUnitsX) do
-			GenerateClick(armyCoordinateX,armyUnitsY)
-			WaitForUI()
-			GenerateClick(targetX,targetY)
+		for i, armyCoordinateX in ipairs(armyUnitsX) do
+			GenerateClick(armyCoordinateX, armyUnitsY)
+			GenerateClick(targetX, targetY)
 		end
 		actionFound = true
-		WaitForUI()
+		Wait(2.0)
 	end	
 	if actionFound == true then
-		FindButtonAndClick("*ui.okButton.button",true)
+		FindButtonAndClick("*ui.okButton.button", true)
 	end
 end
 
 GameState["CASTLE_VIEW"] = function()	
-	
 	if GetProfileNode("castleLevel") >= targetCastleLevel or forceJoinAlliance == true then
 		if GetProfileNode("attributes_VP") < targetVP then
-			GenerateEvent("SWITCH_TO_KINGDOM_VIEW","","");
+			GenerateEvent("SWITCH_TO_KINGDOM_VIEW", "", "");
 		end
 	else
-		
-		if FindButtonAndClick("*.outOfResourcesItem.tapArea",true) then	--Collect Gold
-		elseif FindButtonAndClick("*.ui.confirmation.doneButton",true) then
-		elseif FindButtonAndClick("*.requiredA.button",true) then	--Collect Tick castle Upgrade
-			--FindButtonAndClick("*.upgradeButton",true)	-- Skip/Upgrade Button
-			if FindButtonAndClick("*.requiredB.button",true) then	--Collect Tick castle Upgrade
-			--FindButtonAndClick("*.upgradeButton",true)	
+		if FindButtonAndClick("*.outOfResourcesItem.tapArea", true) then	--Collect Gold
+		elseif FindButtonAndClick("*.ui.confirmation.doneButton", true) then
+		end
+		if hasArmory then -- To check if FollowGuide has upgraded castle once
+			if FindBuilding("Castle"..GetProfileNode("castleLevel")) then 
+				GenerateEvent("SELECT_BUILDING", FindBuilding("Castle"..GetProfileNode("castleLevel")).uniqueId, "") -- Open's Castle Upgrade Panel to upgrade it to level 3
+			end
+			if  FindButtonAndClick("*.requiredA.button", true) then	--Collect Tick castle Upgrade
+				if FindButtonAndClick("*.requiredB.button", true) then	--Collect Tick castle Upgrade
+				end
+			end
+		else
+			if FindBuilding("armory") then
+				hasArmory = true
 			end
 		end
 		
-		Wait(3.0)
-		if FindButtonAndClick("*.upgradeButton",true) then	-- Skip/Upgrade Button
-		
+		Wait(2.0) --Upgrade Button to Appear, WaitForUI() doesn't handle it
+		if FindButtonAndClick("*.upgradeButton", true) then	-- Skip/Upgrade Button
 		end
-		
-		SelectBuilding("Castle"..GetProfileNode("castleLevel")) -- Open's Castle Upgrade Panel to upgrade it to level 3
 	end
 end
 
 GameState["LOADOUT_ATTACK"] = function()
-	FindButtonAndClick("*.header.closeButton",true)
+	FindButtonAndClick("*.header.closeButton", true)
 end
 
 GameState["CAMPAIGN"] = function()
-	FindButtonAndClick("*.raidButton",true)
+	FindButtonAndClick("*.raidButton", true) --To proceed further as FollowGuide fails sometimes due to Talking_Heads
 end
 
 GameState["TROOPS"] = function()
-	if FindButtonAndClick("*ui.ok.doneButton",true) then   --Done/Ok Button
-		FindButtonAndClick("*header.closeButton",true)
+	if FindButtonAndClick("*.upgradeButton", true) then	-- Skip/Upgrade Button
+	end
+	if FindButtonAndClick("*ui.ok.doneButton", true) then   --Done/Ok Button
+		FindButtonAndClick("*header.closeButton", true)
 	end
 end
 
@@ -104,36 +101,33 @@ GameState["EPIC_KINGDOM"] = function()
 	if GetProfileNode("attributes_DIAMONDS") < minDiamondAmount then
 		SetDebugVar("Add diamonds|Currency|Cheats", rechargeDiamondAmount)
 	end
-	if FindButtonAndClick("*.raidButton",false) then
-		FindButtonAndClick("*.header.closeButton",true)
+	if FindButtonAndClick("*.raidButton", false) then
+		FindButtonAndClick("*.header.closeButton", true)
 	end	
-	if GetProfileNode("attributes_VP") < targetVP then  -- To gain targetVP points
+	if GetProfileNode("attributes_VP") < 5000 then  -- To gain targetVP points
 		
-		WaitForUI()
+		WaitForResources()
+		Wait(2.0)
+		GenerateEvent("GO_TO_MY_KINGDOM", "", "");
+		WaitForResources()
+		
+		GenerateDrag(0.51, 0.2, 0.48, 0.80) -- Drag towards Neutral lands
 		Wait(3.0)
-		
-		GenerateEvent("GO_TO_MY_KINGDOM","","");
-		
-		WaitForUI()
-		Wait(3.0)
-		
-		GenerateDrag(0.51,0.2,0.48,0.80) -- Drag towards Neutral lands
-		Wait(3.0)
-		GenerateClick(0.58,0.65) -- Click's on a plinth to gain VP
-		
-		WaitForUI()
+		GenerateClick(0.58, 0.69) -- Click's on a plinth to gain VP
 		Wait(2.0)
 		
-		if  FindButtonAndClick("*.rewardsGrid.*.vp",false) then
-			FindButtonAndClick("*.captureButton",true)
-		else --if FindButtonAndClick("*.pveRecycleButton",true) then
-			GenerateEvent("RECYCLE_PVE_PLINTHS","","")
+		if  FindButtonAndClick("*.rewardsGrid.*.vp", false) then
+			FindButtonAndClick("*.captureButton", true)
+		else 
+			GenerateEvent("RECYCLE_PVE_PLINTHS", "", "")
 			genPlinthCounter = genPlinthCounter + 1
-			WaitForUI()
+			WaitForResources()
 			Wait(2.0)
-			FindButtonAndClick("*.doneButton",true)    --Done/Ok Button
+			FindButtonAndClick("*.doneButton", true)    --Done/Ok Button
 		end
 		
+		WaitForResources ()
+
 		if genPlinthCounter > 3 then
 			forceJoinAlliance = true
 			genPlinthCounter = 0
@@ -141,7 +135,7 @@ GameState["EPIC_KINGDOM"] = function()
 		
 	end
 	if forceJoinAlliance == true then
-		 GenerateEvent("SWITCH_TO_CASTLE","","");
+		 GenerateEvent("SWITCH_TO_CASTLE", "", "");
 	end	
 end
 

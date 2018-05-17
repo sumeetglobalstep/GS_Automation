@@ -1,8 +1,9 @@
 -- Interacts with CPP functions
 
 exitGame = false
+errorMessage = ""
 
-function FindButtonAndClick(path,IsClickable)
+function FindButtonAndClick(path, IsClickable)
 	if FindElementByPath(path) then
 		if IsClickable then
 			FindAndClickByPath(path)
@@ -13,11 +14,25 @@ function FindButtonAndClick(path,IsClickable)
 	end
 end
 
+function FindBuilding(bName)
+  local buildings = GetProfileNode("buildings")
+  for i, building in ipairs(buildings) do
+    if building.type:find(bName) then
+      return building
+    end
+  end
+end
 
-function IsHaltScriptRequested() --Stops Testing Script on request of game or when some stop testing condition is reached
+function IsHaltScriptRequested() --Stop Script on request of game or an error
+	if HasNetworkError() then
+		exitGame = true
+		errorMessage = "Network Issue"
+	end
 	if IsExitRequested() then
 		return true
 	elseif exitGame then
+		--TODO: add log message
+		print ("Script HALTED due to "..errorMessage.." Current STATE: "..GetCurrentState())
 		return true
 	else
 		return false
@@ -25,11 +40,11 @@ function IsHaltScriptRequested() --Stops Testing Script on request of game or wh
 end
 
 function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is higher than FTUE
-	if	FindButtonAndClick("*.ui.textEntry.doneButton",true) then
+	if	FindButtonAndClick("*.ui.textEntry.doneButton", true) then
 		return true
-	elseif FindButtonAndClick("*.ui.critical.doneButton",true) then
+	elseif FindButtonAndClick("*.ui.critical.doneButton", true) then
 		return true
-	elseif FindButtonAndClick("*.ui.confirmation.doneButton",true) then
+	elseif FindButtonAndClick("*.ui.confirmation.doneButton", true) then
 		return true
 	else
 		return false
@@ -37,32 +52,12 @@ function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is hig
 end
 
 function IsPopUpActive() -- Handles PopUps , when FTUE not available
-
-
-	if FindElementByPath("*.outOfResourcesItem.tapArea") then --Collect Gold
-		FindAndClickByPath("*.outOfResourcesItem.tapArea")
-		return true
-	elseif FindElementByPath("*ui.ok.doneButton") then   --Done/Ok Button
+	if FindElementByPath("*ui.ok.doneButton") then   --Done/Ok Button
 		FindAndClickByPath("*ui.ok.doneButton")
 		if FindElementByPath("*header.closeButton") then
 			FindAndClickByPath("*header.closeButton")
 		end
 		return true
-	elseif FindElementByPath("*.requiredA.button") then --Collect Tick castle Upgrade
-		FindAndClickByPath("*.requiredA.button")
-		if FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
-			FindAndClickByPath("*.upgradeButton")
-		end
-		return true
-	elseif FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
-		FindAndClickByPath("*.upgradeButton")
-		return true
-	-- elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") and (GetCurrentState() ~= "BATTLEGAME") then -- Handles unwanted TalkingHeads
-		-- if FindElementByPath("*.ui.talkingHead.animationContainer.*") then
-			-- WaitForUI()
-			-- GenerateClick(0.5,0.5)
-			-- return true
-		-- end
 	end
 	
 	return false
