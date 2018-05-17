@@ -6,20 +6,16 @@ require "Media/GameData/Interactions/GSAutomation/GlobalVars"
 
 
 function AIControl()
-
 	if IsCriticalPopUp() then
 		print("Will Dismiss any CriticalPopUp")
 	elseif IsGuideActive() then
 		print("Will Follow Guide")
 		FollowGuide()
-	elseif IsPopUpActive() then
-		print("Will Dismiss any PopUp")
 	elseif IsStateHandled() then
 		print("StateHandledByScript:",GetCurrentState())
 	else
 		print("Script Waiting To Take Action")
 	end
-
 end
 
 while not IsHaltScriptRequested() do

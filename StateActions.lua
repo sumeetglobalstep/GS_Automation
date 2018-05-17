@@ -1,51 +1,42 @@
 require "Media/GameData/Interactions/Util"
+require "Media/GameData/Interactions/GSAutomation/InteractionAPI"
 
 GameState = {}
 forceJoinAlliance = false
+genPlinthCounter = 0
+targetVP = 1000
+targetCastleLevel = 3
+minDiamondAmount = 1000
+rechargeDiamondAmount = 10000
+
 
 GameState["RESULTS"] = function()
-	print("Inside Results state")
-	if FindElementByPath("*.ui.rewardsScreen.continueButton") then
-		FindAndClickByPath("*.ui.rewardsScreen.continueButton")
-	end
-	if FindElementByPath("*.ui.xpScreen.continueButton") then
-		FindAndClickByPath("*.ui.xpScreen.continueButton")
-	end
+	FindButtonAndClick("*.ui.rewardsScreen.continueButton",true)
+	FindButtonAndClick("*.ui.xpScreen.continueButton",true)	
+end
+
+GameState["SHOP"] = function()
+	 FindButtonAndClick("*.ui.reward.continueButton",true)
+	 FindButtonAndClick("*.header.closeButton",true)
 end
 
 GameState["REWARDS"] = function()
-	print("Inside REWARDS state")
-	if FindElementByPath("*.ui.okButton") then
-		FindAndClickByPath("*.ui.okButton")
-	end
-	
-	return false
+	FindButtonAndClick("*.ui.okButton",true)
 end
 
 GameState["BATTLEGAME"] = function()
-	print("BATTLEGAME state called")
-	if FindElementByPath("*.ui.skip.skipButton") then
-		print("Skip Button Found")
-		FindAndClickByPath("*.ui.skip.skipButton")
-		return true
-	end
-	
-	return false
+	FindButtonAndClick("*.ui.skip.skipButton",true)
 end
 
 GameState["DYNAMIC_DEPLOYMENT"] = function()
-	print("DYNAMIC_DEPLOYMENT state called")
 	local actionFound = false
 	local targetX = 0.5
 	local targetY = 0.3
-	
-	if FindElementByPath("*.autoOrders.Button") then
-		print("AutoOrder Found");
-		FindAndClickByPath("*.autoOrders.Button")
+
+	if FindButtonAndClick("*.autoOrders.Button",true) then
 		actionFound = true
 	end	
-	if FindElementByPath("*.ui.multiSelectButton.button") then
-		FindAndClickByPath("*.ui.multiSelectButton.button")
+	if FindButtonAndClick("*.ui.multiSelectButton.button",true) then
 		WaitForUI()
 		GenerateClick(targetX,targetY)
 		actionFound = true
@@ -55,7 +46,6 @@ GameState["DYNAMIC_DEPLOYMENT"] = function()
 		local armyUnitsY = 0.6
 		
 		for i,armyCoordinateX in ipairs(armyUnitsX) do
-			print("armyCoordinateX",armyCoordinateX)
 			GenerateClick(armyCoordinateX,armyUnitsY)
 			WaitForUI()
 			GenerateClick(targetX,targetY)
@@ -64,58 +54,65 @@ GameState["DYNAMIC_DEPLOYMENT"] = function()
 		WaitForUI()
 	end	
 	if actionFound == true then
-		if FindElementByPath("*ui.okButton.button") then
-			FindAndClickByPath("*ui.okButton.button")
-		end
+		FindButtonAndClick("*ui.okButton.button",true)
 	end
 end
 
-GameState["CASTLE_VIEW"] = function()
+GameState["CASTLE_VIEW"] = function()	
 	
-	SelectBuilding("Castle2") -- Opens Castle Upgrade Panel to upgrade it to level 3
-
-	if GetProfileNode("castleLevel") >=3 or forceJoinAlliance==true then
-		if GetProfileNode("attributes_VP") < 1000 then
-			if FindElementByPath("*.zoomButton") then
-					FindAndClickByPath("*.zoomButton")
+	if GetProfileNode("castleLevel") >= targetCastleLevel or forceJoinAlliance == true then
+		if GetProfileNode("attributes_VP") < targetVP then
+			GenerateEvent("SWITCH_TO_KINGDOM_VIEW","","");
+		end
+	else
+		
+		if FindButtonAndClick("*.outOfResourcesItem.tapArea",true) then	--Collect Gold
+		elseif FindButtonAndClick("*.ui.confirmation.doneButton",true) then
+		elseif FindButtonAndClick("*.requiredA.button",true) then	--Collect Tick castle Upgrade
+			--FindButtonAndClick("*.upgradeButton",true)	-- Skip/Upgrade Button
+			if FindButtonAndClick("*.requiredB.button",true) then	--Collect Tick castle Upgrade
+			--FindButtonAndClick("*.upgradeButton",true)	
 			end
 		end
+		
+		Wait(3.0)
+		if FindButtonAndClick("*.upgradeButton",true) then	-- Skip/Upgrade Button
+		
+		end
+		
+		SelectBuilding("Castle"..GetProfileNode("castleLevel")) -- Open's Castle Upgrade Panel to upgrade it to level 3
 	end
-	
 end
 
 GameState["LOADOUT_ATTACK"] = function()
-	
-	if FindElementByPath("*.header.closeButton") then
-		FindAndClickByPath("*.header.closeButton")
-	end
+	FindButtonAndClick("*.header.closeButton",true)
 end
 
-genPlinthCounter = 0
+GameState["CAMPAIGN"] = function()
+	FindButtonAndClick("*.raidButton",true)
+end
+
+GameState["TROOPS"] = function()
+	if FindButtonAndClick("*ui.ok.doneButton",true) then   --Done/Ok Button
+		FindButtonAndClick("*header.closeButton",true)
+	end
+end
 
 GameState["EPIC_KINGDOM"] = function()
 	forceJoinAlliance = false
 	
-	if GetProfileNode("attributes_DIAMONDS")<2000 then
-		SetDebugVar("Add diamonds|Currency|Cheats", 10000)
+	if GetProfileNode("attributes_DIAMONDS") < minDiamondAmount then
+		SetDebugVar("Add diamonds|Currency|Cheats", rechargeDiamondAmount)
 	end
-	if FindElementByPath("*.raidButton") then
-		if FindElementByPath("*.header.closeButton") then
-			FindAndClickByPath("*.header.closeButton")
-		end
+	if FindButtonAndClick("*.raidButton",false) then
+		FindButtonAndClick("*.header.closeButton",true)
 	end	
-	
-	if GetProfileNode("attributes_VP")<1000 then
+	if GetProfileNode("attributes_VP") < targetVP then  -- To gain targetVP points
 		
 		WaitForUI()
 		Wait(3.0)
 		
-		GenerateDrag(0.5,0.2,0.5,0.9) -- GenerateDrag to Activate Compass Button
-		WaitForUI()
-		Wait(3.0)
-		if FindElementByPath("*.gotoMyKingdomButton") then
-			FindAndClickByPath("*.gotoMyKingdomButton")
-		end
+		GenerateEvent("GO_TO_MY_KINGDOM","","");
 		
 		WaitForUI()
 		Wait(3.0)
@@ -127,35 +124,28 @@ GameState["EPIC_KINGDOM"] = function()
 		WaitForUI()
 		Wait(2.0)
 		
-		if FindElementByPath("*.rewardsGrid.*") then
-			if FindElementByPath("*.captureButton") then
-				FindAndClickByPath("*.captureButton")
-			end
-		elseif FindElementByPath("*.pveRecycleButton") then
-			FindAndClickByPath("*.pveRecycleButton")
+		if  FindButtonAndClick("*.rewardsGrid.*.vp",false) then
+			FindButtonAndClick("*.captureButton",true)
+		else --if FindButtonAndClick("*.pveRecycleButton",true) then
+			GenerateEvent("RECYCLE_PVE_PLINTHS","","")
 			genPlinthCounter = genPlinthCounter + 1
 			WaitForUI()
 			Wait(2.0)
-			if FindElementByPath("*.doneButton") then   --Done/Ok Button
-				FindAndClickByPath("*.doneButton")
-			end
+			FindButtonAndClick("*.doneButton",true)    --Done/Ok Button
 		end
 		
-		if genPlinthCounter>3 then
+		if genPlinthCounter > 3 then
 			forceJoinAlliance = true
+			genPlinthCounter = 0
 		end
 		
 	end
-	
 	if forceJoinAlliance == true then
-		if FindElementByPath("*.zoomButton") then
-			FindAndClickByPath("*.zoomButton")
-		end
+		 GenerateEvent("SWITCH_TO_CASTLE","","");
 	end	
 end
 
 function IsStateHandled()
-
 	if GameState[GetCurrentState()] then
 		GameState[GetCurrentState()]()
 		return true

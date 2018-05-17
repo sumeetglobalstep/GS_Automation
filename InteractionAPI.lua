@@ -2,8 +2,19 @@
 
 exitGame = false
 
-function IsHaltScriptRequested() --Stops Testing Script on request of game or when some stop testing condition is reached
+function FindButtonAndClick(path,IsClickable)
+	if FindElementByPath(path) then
+		if IsClickable then
+			FindAndClickByPath(path)
+		end
+		return true
+	else
+		return false
+	end
+end
 
+
+function IsHaltScriptRequested() --Stops Testing Script on request of game or when some stop testing condition is reached
 	if IsExitRequested() then
 		return true
 	elseif exitGame then
@@ -14,17 +25,15 @@ function IsHaltScriptRequested() --Stops Testing Script on request of game or wh
 end
 
 function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is higher than FTUE
-
-	if FindElementByPath("*.ui.textEntry.doneButton") then
-		FindAndClickByPath("*.ui.textEntry.doneButton")
+	if	FindButtonAndClick("*.ui.textEntry.doneButton",true) then
 		return true
-	end
-	if FindElementByPath("*.ui.critical.doneButton") then
-		FindAndClickByPath("*.ui.critical.doneButton")
+	elseif FindButtonAndClick("*.ui.critical.doneButton",true) then
 		return true
+	elseif FindButtonAndClick("*.ui.confirmation.doneButton",true) then
+		return true
+	else
+		return false
 	end
-	
-	return false
 end
 
 function IsPopUpActive() -- Handles PopUps , when FTUE not available
@@ -33,8 +42,8 @@ function IsPopUpActive() -- Handles PopUps , when FTUE not available
 	if FindElementByPath("*.outOfResourcesItem.tapArea") then --Collect Gold
 		FindAndClickByPath("*.outOfResourcesItem.tapArea")
 		return true
-	elseif FindElementByPath("*.doneButton") then   --Done/Ok Button
-		FindAndClickByPath("*.doneButton")
+	elseif FindElementByPath("*ui.ok.doneButton") then   --Done/Ok Button
+		FindAndClickByPath("*ui.ok.doneButton")
 		if FindElementByPath("*header.closeButton") then
 			FindAndClickByPath("*header.closeButton")
 		end
@@ -48,12 +57,12 @@ function IsPopUpActive() -- Handles PopUps , when FTUE not available
 	elseif FindElementByPath("*.upgradeButton") then -- Skip/Upgrade Button
 		FindAndClickByPath("*.upgradeButton")
 		return true
-	elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") and (GetCurrentState() ~= "BATTLEGAME") then -- Handles unwanted TalkingHeads
-		if FindElementByPath("*.ui.talkingHead.animationContainer.*") then
-			WaitForUI()
-			GenerateClick(0.5,0.5)
-			return true
-		end
+	-- elseif (GetCurrentState() ~= "DYNAMIC_DEPLOYMENT") and (GetCurrentState() ~= "BATTLEGAME") then -- Handles unwanted TalkingHeads
+		-- if FindElementByPath("*.ui.talkingHead.animationContainer.*") then
+			-- WaitForUI()
+			-- GenerateClick(0.5,0.5)
+			-- return true
+		-- end
 	end
 	
 	return false
