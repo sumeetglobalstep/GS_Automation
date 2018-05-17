@@ -6,7 +6,6 @@ prevLessonStep = ""
 lessonCounter = 0
 
 function AIControl()
-	
 	if IsCriticalPopUp() then
 		print("Will Dismiss any CriticalPopUp")
 	elseif IsGuideActive() then

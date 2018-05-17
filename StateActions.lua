@@ -104,7 +104,7 @@ GameState["EPIC_KINGDOM"] = function()
 	if FindButtonAndClick("*.raidButton", false) then
 		FindButtonAndClick("*.header.closeButton", true)
 	end	
-	if GetProfileNode("attributes_VP") < 5000 then  -- To gain targetVP points
+	if GetProfileNode("attributes_VP") < targetVP then  -- To gain targetVP points
 		
 		WaitForResources()
 		Wait(2.0)
@@ -141,6 +141,7 @@ end
 
 function IsStateHandled()
 	if GameState[GetCurrentState()] then
+		WriteLogsToFile("","","")
 		GameState[GetCurrentState()]()
 		return true
 	end
