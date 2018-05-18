@@ -13,7 +13,6 @@ rechargeDiamondAmount = 10000
 GameState = {}
 
 GameState["RESULTS"] = function()
-	IsCheckPointAchieved()
 	FindButtonAndClick("*.continueButton", true)
 end
 
@@ -78,6 +77,7 @@ GameState["CASTLE_VIEW"] = function()
 		
 		Wait(2.0) --Upgrade Button to Appear, WaitForUI() doesn't handle it
 		if FindButtonAndClick("*.upgradeButton", true) then	-- Skip/Upgrade Button
+			IsCheckPointAchieved(GetCurrentState(),"CASTLE_Level: "..GetProfileNode("castleLevel").." Total Diamonds: "..GetProfileNode(attributes_DIAMONDS),"UPGRADED")
 		end
 	end
 end

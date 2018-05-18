@@ -1,6 +1,5 @@
 require "Media/GameData/Interactions/GSAutomation/StateActions"
 require "Media/GameData/Interactions/GSAutomation/InteractionAPI"
---require "Media/GameData/Interactions/GSAutomation/GlobalVars"
 
 prevLessonStep = ""
 lessonCounter = 0
@@ -9,7 +8,8 @@ function AIControl()
 	if IsCriticalPopUp() then
 		print("Will Dismiss any CriticalPopUp")
 	elseif IsGuideActive() then
-		if  prevLessonStep == GetCurrentLessonStep() then -- Checks If FollowGuide BREAKS
+		-- ``````````````````  Check if FollowGuide Breaks ```````````````````````````
+		if  prevLessonStep == GetCurrentLessonStep() then
 			lessonCounter = lessonCounter + 1
 			if lessonCounter > 10 then
 				exitGame = true
@@ -31,7 +31,7 @@ function AIControl()
 end
 
 while not IsHaltScriptRequested() do
-	IsCheckPointAchieved()
+	IsCheckPointAchieved(GetCurrentState(),GetCurrentLessonName(),"PASS") --TODO: remove this call
 	AIControl()
 	Wait(1.0)
 end

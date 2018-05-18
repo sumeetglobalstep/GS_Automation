@@ -1,46 +1,43 @@
 hasCheckPoint = false
-checkPointAcheived = {"dummyValue"}
+checkPointAcheived = {}
 logFileExist = false
-
+insertAtIndex = 0
 function InitialiseOutputFile()
 	print("Inside InitialiseOutputFile")
 	Filename = os.date()
 	Filename = string.gsub(Filename, ":+", "") 
 	Filename = string.gsub(Filename, "%s+", "")
 	Filename = "DOCUMENTS:ResultData_"..Filename..".txt"
-	file = io.open(Filename,"w+")
+	file = io.open(Filename, "w+")
 	io.output(file)
+	io.write("GAME INFO:"..GetGameInfo())
 	logFileExist = true
 end
 
-function WriteLogsToFile(message,path,result)
+function WriteLogsToFile(message,result)
 		--io.write(" Current State :\t", GetCurrentState()," Lesson Name : ", GetCurrentLessonName() ," Lesson Step Name : ", GetCurrentLessonStep(), " " , message , " ", path, " RESULT : ",result,"\n")
-			io.write("\nPASS MESSAGE: ",message)
+			io.write("RESULT: "..result.." "..message)
 end
 
-function IsCheckPointAchieved()
+function IsCheckPointAchieved(gameState,checkPointName,result)
 
-	local lessonName = GetCurrentLessonName()
-	
 	if logFileExist == false then
 		InitialiseOutputFile()
 	end
-	print("Lesson Name", lessonName)
-	found = false
-	if lessonName ~= '' then
-		for i,checkPoint in ipairs(checkPointAcheived) do
+	if checkPointName ~= '' then
+		for index, value in ipairs(checkPointAcheived) do
 			--io.write("\nCheckPoint ",checkPoint)
-			if checkPoint:find(lessonName) then
-				found = true
+			if value == checkPointName then
 				return false
+			else
+				print(" CHECKPOINT NAME: "..checkPointName..", RESULT: "..result)
+				insertAtIndex = insertAtIndex + 1
+				table.insert(checkPointAcheived, insertAtIndex, checkPointName)
+				WriteLogsToFile("Game State: "..gameState.."Log: "..checkPointName.."", result)
+				Wait(1.0)
+				return true
 			end	
 		end		
-		if found == false then
-			table.insert(checkPointAcheived,lessonName)
-			WriteLogsToFile(""..lessonName.." completed","","PASS")
-			Wait(1.0)
-			return true
-		end
 	end
 	return false
 end

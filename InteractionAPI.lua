@@ -1,4 +1,5 @@
 -- Interacts with CPP functions
+require "Media/GameData/Interactions/GSAutomation/Log"
 
 exitGame = false
 errorMessage = ""
@@ -33,6 +34,7 @@ function IsHaltScriptRequested() --Stop Script on request of game or an error
 	elseif exitGame then
 		--TODO: add log message
 		print ("Script HALTED due to "..errorMessage.." Current STATE: "..GetCurrentState())
+		IsCheckPointAchieved(GetCurrentState(),errorMessage,"FAIL")
 		return true
 	else
 		return false
