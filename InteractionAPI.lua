@@ -40,7 +40,6 @@ function IsHaltScriptRequested() --Stop Script on request of game or an error
 end
 
 function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is higher than FTUE
-	WriteLogsToFile("","","")
 	if	FindButtonAndClick("*.ui.textEntry.doneButton", true) then
 		return true
 	elseif FindButtonAndClick("*.ui.critical.doneButton", true) then
@@ -53,7 +52,6 @@ function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is hig
 end
 
 function IsPopUpActive() -- Handles PopUps , when FTUE not available
-	WriteLogsToFile("","","")
 	if FindElementByPath("*ui.ok.doneButton") then   --Done/Ok Button
 		FindAndClickByPath("*ui.ok.doneButton")
 		if FindElementByPath("*header.closeButton") then
@@ -63,22 +61,4 @@ function IsPopUpActive() -- Handles PopUps , when FTUE not available
 	end
 	
 	return false
-end
-
-
-
-
-function InitialiseOutputFile()
-	print("Inside InitialiseOutputFile")
-	Filename = os.date()
-	Filename = string.gsub(Filename, ":+", "") 
-	Filename = string.gsub(Filename, "%s+", "")
-	Filename = "DOCUMENTS:ResultData_"..Filename..".txt"
-	file = io.open(Filename,"w+")
-	io.output(file)
-	
-end
-
-function WriteLogsToFile(message,path,result)
-	io.write(" Current State :\t", GetCurrentState()," Lesson Name : ", GetCurrentLessonName() ," Lesson Step Name : ", GetCurrentLessonStep(), " " , message , " ", path, " RESULT : ",result,"\n")
 end

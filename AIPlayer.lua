@@ -31,6 +31,7 @@ function AIControl()
 end
 
 while not IsHaltScriptRequested() do
+	IsCheckPointAchieved()
 	AIControl()
 	Wait(1.0)
 end

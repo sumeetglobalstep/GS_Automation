@@ -1,16 +1,19 @@
 require "Media/GameData/Interactions/GSAutomation/InteractionAPI"
+require "Media/GameData/Interactions/GSAutomation/Log"
 
-GameState = {}
 forceJoinAlliance = false
+hasArmory = false
+
 genPlinthCounter = 0
 targetVP = 1000
 targetCastleLevel = 3
 minDiamondAmount = 1000
 rechargeDiamondAmount = 10000
 
-hasArmory = false
+GameState = {}
 
 GameState["RESULTS"] = function()
+	IsCheckPointAchieved()
 	FindButtonAndClick("*.continueButton", true)
 end
 
@@ -141,7 +144,6 @@ end
 
 function IsStateHandled()
 	if GameState[GetCurrentState()] then
-		WriteLogsToFile("","","")
 		GameState[GetCurrentState()]()
 		return true
 	end
