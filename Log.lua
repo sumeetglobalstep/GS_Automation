@@ -3,24 +3,24 @@ checkPointAcheived = {}
 logFileExist = false
 insertAtIndex = 0
 
-function InitialiseOutputFile()
+function CreateLogFile()
 	Filename = os.date()
 	Filename = string.gsub(Filename, ":+", "")
 	Filename = string.gsub(Filename, "%s+", "")
 	Filename = "DOCUMENTS:ResultData_"..Filename..".txt"
 	file = io.open(Filename, "w+")
 	io.output(file)
-	io.write("GAME INFO:"..GetGameInfo())
+	io.write("GAME INFO: "..GetGameInfo().."\n Game Start Time: "..os.date())
 	logFileExist = true
 end
 
-function WriteLogsToFile(message, result)
-	io.write("RESULT: "..result.." "..message.."\n")
+function WriteLogsToFile(message)
+	io.write("\n"..message)
 end
 
-function HasValue(checkPointName)
+function HasValue(logMessage)
     for index, value in ipairs(checkPointAcheived) do
-		if value == checkPointName then
+		if value == logMessage then
 			return true
         end
     end
@@ -28,15 +28,15 @@ function HasValue(checkPointName)
     return false
 end
 
-function LogToFile(gameState, checkPointName, result)
+function LogToFile(gameState, logMessage, result)
 	if logFileExist == false then
-		InitialiseOutputFile()
+		CreateLogFile()
 	end
-	if checkPointName ~= '' then
-		if HasValue(checkPointName) == false then
+	if logMessage ~= '' then
+		if HasValue(logMessage) == false then
 			insertAtIndex = insertAtIndex + 1
-			table.insert(checkPointAcheived, checkPointName)
-			WriteLogsToFile("Game State: "..gameState.."Log: "..checkPointName.."", result)
+			table.insert(checkPointAcheived, logMessage)
+			WriteLogsToFile("\tGame State: "..gameState.."\tLog: "..logMessage.."\t Result: "..result )
 		end	
 	end
 end

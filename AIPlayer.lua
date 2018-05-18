@@ -31,7 +31,7 @@ function AIControl()
 end
 
 while not IsHaltScriptRequested() do
-	LogToFile(GetCurrentState(), GetCurrentLessonName(), "PASS")	-- TODO: remove this call
+	LogToFile(GetCurrentState(), GetCurrentLessonName(), "PASS")
 	AIControl()
 	Wait(1.0)
 end

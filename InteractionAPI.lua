@@ -22,12 +22,14 @@ function FindBuilding(bName)
 			return building
 		end
 	end
+	
+	return nil
 end
 
---Stop Script on request of game or an error
+-- Stop Script on request of game or an error
 function IsHaltScriptRequested()
 	if HasNetworkError() then
-		exitGame = true
+		-- exitGame = true
 		errorMessage = "Network Issue"
 	end
 	if IsExitRequested() then
@@ -55,7 +57,7 @@ end
 
 -- Handles n PopUps (PopUps with lower priority than FTUE)
 function IsPopUpActive()
-	if FindButtonAndClick("*ui.ok.doneButton", true) then	--Done/Ok Button
+	if FindButtonAndClick("*ui.ok.doneButton", true) then	-- Done/Ok Button
 		FindButtonAndClick("*header.closeButton", true)
 		return true
 	end
