@@ -4,9 +4,9 @@ require "Media/GameData/Interactions/GSAutomation/Log"
 exitGame = false
 errorMessage = ""
 
-function FindButtonAndClick(path, IsClickable)
+function FindButtonAndClick(path, isClickable)
 	if FindElementByPath(path) then
-		if IsClickable then
+		if isClickable then
 			FindAndClickByPath(path)
 		end
 		return true
@@ -16,15 +16,16 @@ function FindButtonAndClick(path, IsClickable)
 end
 
 function FindBuilding(bName)
-  local buildings = GetProfileNode("buildings")
-  for i, building in ipairs(buildings) do
-    if building.type:find(bName) then
-      return building
-    end
-  end
+	local buildings = GetProfileNode("buildings")
+	for i, building in ipairs(buildings) do
+		if building.type:find(bName) then
+			return building
+		end
+	end
 end
 
-function IsHaltScriptRequested() --Stop Script on request of game or an error
+--Stop Script on request of game or an error
+function IsHaltScriptRequested()
 	if HasNetworkError() then
 		exitGame = true
 		errorMessage = "Network Issue"
@@ -32,17 +33,16 @@ function IsHaltScriptRequested() --Stop Script on request of game or an error
 	if IsExitRequested() then
 		return true
 	elseif exitGame then
-		--TODO: add log message
-		print ("Script HALTED due to "..errorMessage.." Current STATE: "..GetCurrentState())
-		IsCheckPointAchieved(GetCurrentState(),errorMessage,"FAIL")
+		IsCheckPointAchieved(GetCurrentState(), errorMessage, "FAIL")
 		return true
 	else
 		return false
 	end
 end
 
-function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is higher than FTUE
-	if	FindButtonAndClick("*.ui.textEntry.doneButton", true) then
+-- Handles Critical PopUps (PopUps with higher priority than FTUE)
+function IsCriticalPopUp()
+	if FindButtonAndClick("*.ui.textEntry.doneButton", true) then
 		return true
 	elseif FindButtonAndClick("*.ui.critical.doneButton", true) then
 		return true
@@ -53,14 +53,12 @@ function IsCriticalPopUp() -- Handles Critical PopUps , Interupt Priority is hig
 	end
 end
 
-function IsPopUpActive() -- Handles PopUps , when FTUE not available
-	if FindElementByPath("*ui.ok.doneButton") then   --Done/Ok Button
-		FindAndClickByPath("*ui.ok.doneButton")
-		if FindElementByPath("*header.closeButton") then
-			FindAndClickByPath("*header.closeButton")
-		end
+-- Handles n PopUps (PopUps with lower priority than FTUE)
+function IsPopUpActive()
+	if FindButtonAndClick("*ui.ok.doneButton", true) then	--Done/Ok Button
+		FindButtonAndClick("*header.closeButton", true)
 		return true
+	else
+		return false
 	end
-	
-	return false
 end
