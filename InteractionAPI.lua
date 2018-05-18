@@ -10,9 +10,9 @@ function FindButtonAndClick(path, isClickable)
 			FindAndClickByPath(path)
 		end
 		return true
-	else
-		return false
 	end
+	
+	return false
 end
 
 function FindBuilding(bName)
@@ -33,11 +33,11 @@ function IsHaltScriptRequested()
 	if IsExitRequested() then
 		return true
 	elseif exitGame then
-		IsCheckPointAchieved(GetCurrentState(), errorMessage, "FAIL")
+		LogToFile(GetCurrentState(), errorMessage, "FAIL")
 		return true
-	else
-		return false
 	end
+	
+	return false
 end
 
 -- Handles Critical PopUps (PopUps with higher priority than FTUE)
@@ -48,9 +48,9 @@ function IsCriticalPopUp()
 		return true
 	elseif FindButtonAndClick("*.ui.confirmation.doneButton", true) then
 		return true
-	else
-		return false
 	end
+	
+	return false
 end
 
 -- Handles n PopUps (PopUps with lower priority than FTUE)
@@ -58,7 +58,7 @@ function IsPopUpActive()
 	if FindButtonAndClick("*ui.ok.doneButton", true) then	--Done/Ok Button
 		FindButtonAndClick("*header.closeButton", true)
 		return true
-	else
-		return false
 	end
+	
+	return false
 end

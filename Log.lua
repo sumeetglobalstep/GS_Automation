@@ -15,25 +15,28 @@ function InitialiseOutputFile()
 end
 
 function WriteLogsToFile(message, result)
-	io.write("RESULT: "..result.." "..message)
+	io.write("RESULT: "..result.." "..message.."\n")
 end
 
-function IsCheckPointAchieved(gameState, checkPointName, result)
+function HasValue(checkPointName)
+    for index, value in ipairs(checkPointAcheived) do
+		if value == checkPointName then
+			return true
+        end
+    end
+	
+    return false
+end
+
+function LogToFile(gameState, checkPointName, result)
 	if logFileExist == false then
 		InitialiseOutputFile()
 	end
 	if checkPointName ~= '' then
-		for index, value in ipairs(checkPointAcheived) do
-			if value == checkPointName then
-				return false
-			else
-				insertAtIndex = insertAtIndex + 1
-				table.insert(checkPointAcheived, insertAtIndex, checkPointName)
-				WriteLogsToFile("Game State: "..gameState.."Log: "..checkPointName.."", result)
-				Wait(1.0)
-				return true
-			end	
-		end
+		if HasValue(checkPointName) == false then
+			insertAtIndex = insertAtIndex + 1
+			table.insert(checkPointAcheived, checkPointName)
+			WriteLogsToFile("Game State: "..gameState.."Log: "..checkPointName.."", result)
+		end	
 	end
-	return false
 end
